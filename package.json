@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "nodemon server/index.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,13 @@
   "bugs": {
     "url": "https://github.com/ryanminjaeshin/proxy-fec/issues"
   },
-  "homepage": "https://github.com/ryanminjaeshin/proxy-fec#readme"
+  "homepage": "https://github.com/ryanminjaeshin/proxy-fec#readme",
+  "dependencies": {
+    "build": "^0.1.4",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "nodemon": "^2.0.4",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  }
 }
