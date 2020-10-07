@@ -1,28 +1,55 @@
-/* eslint-disable no-console */
 const express = require('express');
-const cors = require('cors');
 const path = require('path');
-const { createProxyMiddleware } = require('http-proxy-middleware');
-
-const proxy = createProxyMiddleware({
-  target: 'http://localhost:8080',
-  changeOrigin: true, // for vhosted sites, changes host header to target's host
-  logLevel: 'debug',
-});
+const cors = require('cors');
+const axios = require('axios');
 
 const app = express();
+const port = 9999;
 
-const PORT = 9999;
-// const bodyParser = require('body-parser');
-
-app.use(cors());
-app.use('/products/', proxy);
-// app.use('/', router)
 app.use(express.static(path.join(__dirname, '../client')));
+app.use(cors());
 
-// app.use(bodyParser.json());
-// app.use(bodyParser.urlencoded({ extended: true }));
+app.get('/products/:src/:id', (req, res) => {
+  const { src, id } = req.params;
+  let path;
 
-app.listen(PORT, () => {
-  console.log(`server is running and listening on port ${PORT}`);
+  if(src === 'featureExplorer') {
+    path = 'http://localhost:3000';
+  }
+  else if(src === 'relatedProducts') {
+    path = 'http://localhost:3001';
+  }
+  else if(src === 'productInfo') {
+    path = 'http://localhost:3002';
+  }
+
+  axios.get(`${path}/products/${id}`)
+  .then((response) => {
+    res.status(200).send(response.data);
+  })
+  .catch((error) => {
+    res.status(400).send(error);
+  })
+});
+
+
+const Proxy = (targetUrl) => (req, res) => {
+  axios.get(targetUrl + req.originalUrl + req.params.id)
+    .then((response) => {
+      res.send(response.data);
+    })
+    .catch((error) => {
+      res.send(error);
+    });
+};
+const proxyQuestions = Proxy('http://localhost:3004');
+const proxyReviews = Proxy('http://localhost:7777');
+const proxyRelatedProducts = Proxy('http://localhost:3001');
+
+app.use('/questions/:id', proxyQuestions);
+app.use('/review/:id', proxyReviews);
+app.use('/relatedProducts/:id', proxyRelatedProducts);
+
+app.listen(port, () => {
+  console.log(`listening on port ${port}`);
 });
